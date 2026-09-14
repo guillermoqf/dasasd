@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#315b4b">
+    <title>Septiembre 2026</title>
+
+    <style>
+        :root {
+            --verde: #315b4b;
+            --verde-claro: #a9c3ad;
+            --rosa: #e8b8c4;
+            --rosa-claro: #fff0f3;
+            --fondo: #f8f4ea;
+            --texto: #29483d;
+            --blanco: #fffdf9;
+            --sombra: 0 18px 50px #54756522;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-width: 280px;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--texto);
+            font-family: Georgia, "Times New Roman", serif;
+            background:
+                radial-gradient(circle at 10% 5%, #f8dfe5 0 6%, transparent 25%),
+                radial-gradient(circle at 95% 95%, #dcebdc 0 5%, transparent 24%),
+                linear-gradient(135deg, var(--fondo), #eaf2e8 55%, #f9e8eb);
+        }
+
+        body::before,
+        body::after {
+            position: fixed;
+            z-index: -1;
+            opacity: .35;
+            pointer-events: none;
+            font-size: clamp(3rem, 10vw, 6rem);
+        }
+
+        body::before {
+            content: "❀";
+            top: 3%;
+            left: 3%;
+            color: #789c80;
+            transform: rotate(-20deg);
+        }
+
+        body::after {
+            content: "♡";
+            right: 4%;
+            bottom: 4%;
+            color: #d88f9f;
+            transform: rotate(20deg);
+        }
+
+        main {
+            width: min(940px, calc(100% - 32px));
+            margin: clamp(24px, 7vh, 72px) auto;
+        }
+
+        .introduccion {
+            margin-bottom: 28px;
+            text-align: center;
+        }
+
+        .introduccion h1 {
+            margin: 8px 0;
+            color: var(--verde);
+            font-size: clamp(2rem, 7vw, 4rem);
+            font-weight: normal;
+            letter-spacing: clamp(1px, .8vw, 3px);
+            overflow-wrap: anywhere;
+        }
+
+        .texto-introduccion {
+            max-width: 650px;
+            margin: auto;
+            color: #648273;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .texto-introduccion p {
+            margin: 10px 0;
+        }
+
+        .mes-frase {
+            color: #6c8277;
+            font-style: italic;
+        }
+
+        .calendario,
+        .final,
+        .vista-dia,
+        .mensaje-bloqueado {
+            border: 1px solid #ffffff;
+            border-radius: clamp(18px, 4vw, 28px);
+            background: #ffffffc9;
+            box-shadow: var(--sombra);
+            backdrop-filter: blur(8px);
+        }
+
+        .calendario,
+        .final {
+            padding: clamp(16px, 4vw, 32px);
+        }
+
+        .calendario h2 {
+            margin: 0 0 22px;
+            color: var(--verde);
+            text-align: center;
+            font-size: clamp(1.4rem, 4vw, 2rem);
+            font-weight: normal;
+        }
+
+        .semana,
+        .dias {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: clamp(4px, 1.5vw, 12px);
+        }
+
+        .semana {
+            margin-bottom: 10px;
+            color: #628271;
+            text-align: center;
+            font: 600 clamp(.55rem, 1.6vw, .78rem) Arial, sans-serif;
+        }
+
+        .semana span {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .dia {
+            width: 100%;
+            min-width: 0;
+            min-height: clamp(58px, 10vw, 104px);
+            padding: clamp(6px, 1.5vw, 12px);
+            border: 1px solid #d8e6d9;
+            border-radius: clamp(9px, 2vw, 15px);
+            color: var(--texto);
+            background: #fffdf9d9;
+            cursor: pointer;
+            text-align: center;
+            font: clamp(.8rem, 2vw, 1.05rem) Georgia, serif;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform .2s, box-shadow .2s, background .2s;
+        }
+
+        .dia:hover {
+            transform: translateY(-4px);
+            background: white;
+            box-shadow: 0 9px 18px #587f6828;
+        }
+
+        .dia:active {
+            transform: scale(.94);
+        }
+
+        .dia:focus-visible,
+        .volver-calendario:focus-visible {
+            outline: 3px solid #d88f9f;
+            outline-offset: 3px;
+        }
+
+        .dia.pasado {
+            border-color: var(--rosa);
+            background: var(--rosa-claro);
+        }
+
+        .dia.futuro {
+            border-color: var(--verde-claro);
+            background: #eef6ee;
+        }
+
+        .dia.actual {
+            border: 2px solid #d692a2;
+            background: #fff3f5;
+            box-shadow: 0 0 0 4px #e8b8c455;
+        }
+
+        .nota {
+            margin: 20px 0 0;
+            color: #789083;
+            text-align: center;
+            font: 12px Arial, sans-serif;
+        }
+
+        .vista-dia,
+        .mensaje-bloqueado,
+        .final,
+        .contenido-dia {
+            display: none;
+        }
+
+        .vista-dia.activo,
+        .mensaje-bloqueado.activo,
+        .final.visible,
+        .contenido-dia.activo {
+            display: block;
+        }
+
+        .vista-dia,
+        .mensaje-bloqueado {
+            margin-top: 28px;
+            padding: clamp(18px, 5vw, 48px);
+            text-align: center;
+            animation: aparecer .4s ease;
+        }
+
+        .contenido-dia h2,
+        .mensaje-bloqueado h2,
+        .final h2 {
+            margin-top: 0;
+            color: var(--verde);
+            font-size: clamp(1.7rem, 5vw, 3rem);
+            font-weight: normal;
+            overflow-wrap: anywhere;
+        }
+
+        .contenido-dia h3 {
+            color: #bf7285;
+            font-weight: normal;
+        }
+
+        .contenido-dia p,
+        .mensaje-bloqueado p,
+        .final p {
+            max-width: 680px;
+            margin: 14px auto;
+            color: #587066;
+            font-size: clamp(.95rem, 2vw, 1.1rem);
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+        .contenido-dia {
+            position: relative;
+            isolation: isolate;
+        }
+
+        .contenido-dia>*:not(.imagen-dia) {
+            position: relative;
+            z-index: 1;
+        }
+
+        .contenido-dia .imagen-dia {
+            position: absolute;
+            z-index: 0;
+            top: 50%;
+            left: 50%;
+            width: min(82vw, 430px);
+            height: min(82vw, 430px);
+            margin: 0;
+            display: block;
+            transform: translate(-50%, -50%);
+            opacity: .4;
+            pointer-events: none;
+            clip-path: path("M 50 90 C 5 45 0 0 25 0 C 40 0 50 15 50 15 C 50 15 60 0 75 0 C 100 0 95 45 50 90 Z");
+            clip-path: polygon(50% 100%, 8% 58%, 0% 38%, 2% 20%, 14% 7%, 30% 4%, 50% 20%, 70% 4%, 86% 7%, 98% 20%, 100% 38%, 92% 58%);
+        }
+
+        .contenido-dia .imagen-dia img {
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            max-height: none;
+            border-radius: 0;
+            object-fit: cover;
+        }
+
+        .frase-dia {
+            color: #bf7285;
+            font-style: italic;
+        }
+
+        .imagen-dia,
+        .galeria-dia {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+            gap: 15px;
+            margin: 22px 0;
+        }
+
+        .imagen-dia img,
+        .galeria-dia img,
+        .contenido-dia>img {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            max-height: 380px;
+            border-radius: 20px;
+            object-fit: cover;
+        }
+
+        .mensaje-dia {
+            margin-top: 28px;
+            padding: clamp(14px, 3vw, 22px);
+            border-radius: 18px;
+            background: #fff0f3;
+        }
+
+        .volver-calendario {
+            display: inline-block;
+            max-width: 100%;
+            margin-top: 22px;
+            padding: 12px 24px;
+            border: 0;
+            border-radius: 30px;
+            color: white;
+            background: var(--verde);
+            cursor: pointer;
+            font: 14px Arial, sans-serif;
+            transition: background .2s, transform .2s;
+        }
+
+        .volver-calendario:hover {
+            background: #477b63;
+            transform: translateY(-2px);
+        }
+
+        .final {
+            margin-top: 28px;
+            text-align: center;
+        }
+
+        .final img {
+            display: block;
+            width: min(100%, 500px);
+            max-height: 360px;
+            margin: 20px auto 0;
+            border-radius: 20px;
+            object-fit: cover;
+        }
+
+        .oculto {
+            display: none !important;
+        }
+
+        @keyframes aparecer {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            main {
+                width: calc(100% - 20px);
+                margin: 24px auto;
+            }
+
+            .calendario {
+                padding: 12px 8px;
+            }
+
+            .semana,
+            .dias {
+                gap: 5px;
+            }
+
+            .dia {
+                min-height: 58px;
+            }
+
+            .vista-dia,
+            .mensaje-bloqueado {
+                margin-top: 20px;
+                padding: 20px 14px;
+            }
+
+            .imagen-dia,
+            .galeria-dia {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .imagen-dia img,
+            .galeria-dia img,
+            .contenido-dia>img {
+                max-height: 300px;
+            }
+
+            .volver-calendario {
+                width: min(100%, 280px);
+            }
+        }
+
+        @media (max-width: 380px) {
+            .semana span {
+                font-size: 0;
+            }
+
+            .semana span::after {
+                font-size: .62rem;
+            }
+
+            .semana span:nth-child(1)::after {
+                content: "LUN";
+            }
+
+            .semana span:nth-child(2)::after {
+                content: "MAR";
+            }
+
+            .semana span:nth-child(3)::after {
+                content: "MIÉ";
+            }
+
+            .semana span:nth-child(4)::after {
+                content: "JUE";
+            }
+
+            .semana span:nth-child(5)::after {
+                content: "VIE";
+            }
+
+            .semana span:nth-child(6)::after {
+                content: "SÁB";
+            }
+
+            .semana span:nth-child(7)::after {
+                content: "DOM";
+            }
+
+            .dia {
+                min-height: 52px;
+                font-size: .78rem;
+            }
+
+            .nota {
+                font-size: 11px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+
+        <section class="introduccion" id="introduccion">
+            <h1>SEPTIEMBRE 2026</h1>
+
+            <div class="texto-introduccion">
+                <p>Analia, quise guardar este mes de una forma especial para ti.</p>
+                <p>Cada día puede convertirse en un pequeño recuerdo para volver a mirar.</p>
+                <p>Aquí puedes escribir lo que vivimos y lo que quieres conservar.</p>
+                <p>Espero que este calendario te haga sonreír cada vez que lo abras.</p>
+            </div>
+
+            <p class="mes-frase">Un mes para guardar con cariño.</p>
+        </section>
+
+        <section class="calendario" id="calendario" data-year="2026" data-month="8">
+            <h2>SEPTIEMBRE 2026</h2>
+
+            <div class="semana">
+                <span>LUNES</span>
+                <span>MARTES</span>
+                <span>MIÉRCOLES</span>
+                <span>JUEVES</span>
+                <span>VIERNES</span>
+                <span>SÁBADO</span>
+                <span>DOMINGO</span>
+            </div>
+
+            <div class="dias">
+                <span aria-hidden="true"></span>
+                <button class="dia" data-dia="1">1</button>
+                <button class="dia" data-dia="2">2</button>
+                <button class="dia" data-dia="3">3</button>
+                <button class="dia" data-dia="4">4</button>
+                <button class="dia" data-dia="5">5</button>
+                <button class="dia" data-dia="6">6</button>
+                <button class="dia" data-dia="7">7</button>
+                <button class="dia" data-dia="8">8</button>
+                <button class="dia" data-dia="9">9</button>
+                <button class="dia" data-dia="10">10</button>
+                <button class="dia" data-dia="11">11</button>
+                <button class="dia" data-dia="12">12</button>
+                <button class="dia" data-dia="13">13</button>
+                <button class="dia" data-dia="14">14</button>
+                <button class="dia" data-dia="15">15</button>
+                <button class="dia" data-dia="16">16</button>
+                <button class="dia" data-dia="17">17</button>
+                <button class="dia" data-dia="18">18</button>
+                <button class="dia" data-dia="19">19</button>
+                <button class="dia" data-dia="20">20</button>
+                <button class="dia" data-dia="21">21</button>
+                <button class="dia" data-dia="22">22</button>
+                <button class="dia" data-dia="23">23</button>
+                <button class="dia" data-dia="24">24</button>
+                <button class="dia" data-dia="25">25</button>
+                <button class="dia" data-dia="26">26</button>
+                <button class="dia" data-dia="27">27</button>
+                <button class="dia" data-dia="28">28</button>
+                <button class="dia" data-dia="29">29</button>
+                <button class="dia" data-dia="30">30</button>
+            </div>
+
+            <p class="nota">Cada día guarda un espacio para escribir tu propia historia.</p>
+        </section>
+
+
+        <section class="mensaje-bloqueado" id="mensaje-bloqueado">
+            <h2>Todavía nooo</h2>
+            <p>Este día todavía guarda un pequeño secreto. Tendrás que esperar hasta que llegueeee </p>
+            <button class="volver-calendario">Volver al calendario</button>
+        </section>
+
+        <section class="vista-dia" id="vista-dia">
+
+            <!-- ==================== DÍA 1 ==================== -->
+            <div class="contenido-dia" id="dia-1">
+                <h2>Día 1 — Donde todo comenzó</h2>
+
+                <div class="frase-dia">
+                    <p>A veces, lo más bonito comienza con una simple conversación.</p>
+                </div>
+
+                <div class="imagen-dia">
+                    <img src="./img/Dia1.jpg" alt="Día 1">
+                </div>
+
+                <div class="resumen-dia">
+                    <p>Ese día comenzamos a hablar y, sin saber todo lo que vendría después, empezó una etapa que
+                        terminó significando muchísimo para mí.</p>
+
+                    <p>Mientras te iba conociendo fui descubriendo muchas cosas de ti, de tu forma de pensar, de lo que
+                        te gusta, de lo que te importa y de todas esas pequeñas cosas que hacen que seas tú.</p>
+
+                    <p>También fue un día que me hizo querer mejorar. Conocerte me hizo mirar muchas cosas de mí de otra
+                        manera y aprender a ser una mejor versión de mí mismo.</p>
+
+                    <p>Y entre todas esas conversaciones nació también la idea de comenzar a guardar nuestros momentos,
+                        porque desde ese día sentí que había recuerdos que valía la pena conservar.</p>
+                </div>
+
+                <div class="mensaje-dia">
+                    <p>Gracias por haber sido el comienzo de tantos recuerdos que hoy guardo con muchísimo cariño. ♡</p>
+                </div>
+            </div>
+
+
+            <!-- ==================== DÍA 2 ==================== -->
+            <div class="contenido-dia" id="dia-2">
+                <h2>Día 2 — Quedarme un poco más</h2>
+
+                <div class="frase-dia">
+                    <p>Hay momentos sencillos que terminan quedándose para siempre.</p>
+                </div>
+
+                <div class="imagen-dia">
+                    <img src="./img/Dia2.jpg" alt="Día 2">
+                </div>
+
+                <div class="resumen-dia">
+                    <p>Ese día te ayudé con tu trabajo y terminamos quedándonos hasta tarde haciéndolo juntos. El tiempo
+                        pasó entre tareas, conversaciones y pequeños momentos que hicieron special aquella noche.</p>
+
+                    <p>Aunque terminamos cansados, para mí valió completamente la pena. Me gustó poder estar contigo,
+                        ayudarte y compartir ese tiempo a tu lado.</p>
+
+                    <p>Quizás para ti solamente fue una noche haciendo un trabajo, pero para mí fue uno de esos momentos
+                        que se vuelven importantes precisamente porque no necesitan ser enormes para sentirse
+                        especiales.</p>
+
+                    <p>Ese día también me hizo darme cuenta de que quiero ser alguien con quien puedas contar cuando
+                        necesites ayuda, cuando tengas algo difícil por hacer o simplemente cuando necesites que alguien
+                        se quede un poquito más.</p>
+                </div>
+
+                <div class="mensaje-dia">
+                    <p>Si alguna vez necesitas que me quede un poco más, mientras pueda, voy a estar ahí. ♡</p>
+                </div>
+            </div>
+
+
+            <!-- ==================== DÍA 3 ==================== -->
+            <div class="contenido-dia" id="dia-3">
+                <h2>Día 3 — Un juguito y un deseo</h2>
+
+                <div class="frase-dia">
+                    <p>Un pequeño momento también puede convertirse en un gran recuerdo.</p>
+                </div>
+
+                <div class="imagen-dia">
+                    <img src=".//img/Dia3.jpg" alt="Día 3">
+                </div>
+
+                <div class="resumen-dia">
+                    <p>Ese día nos encontramos y compartimos un momento muy sencillo, pero que para mí fue muy bonito.
+                        Tú tomaste tu jugo de naranja y yo mi jugo de sandía, y por un rato simplemente disfrutamos de
+                        estar juntos.</p>
+
+                    <p>Después llegó el momento de despedirte para que pudieras ir a tus clases y presentar tu
+                        exposición. Antes de que te fueras te deseé mucha suerte, porque de verdad quería que te fuera
+                        increíble.</p>
+
+                    <p>Me gusta poder acompañarte aunque sea con unas palabras antes de que hagas algo importante. Saber
+                        que tienes algo por delante y poder decirte que confío en ti es algo que me nace hacer.</p>
+
+                    <p>Ese pequeño “suerte” llevaba mucho más cariño del que parecía. Era mi manera de decirte que
+                        quería verte cumplir tus cosas y que siempre voy a alegrarme por cada logro tuyo.</p>
+                </div>
+
+                <div class="mensaje-dia">
+                    <p>Siempre voy a desearte suerte, pero sobre todo, siempre voy a creer en ti. ♡</p>
+                </div>
+            </div>
+
+
+            <!-- ==================== DÍA 4 ==================== -->
+            <div class="contenido-dia" id="dia-4">
+                <h2>Día 4 — Los primeros detalles</h2>
+
+                <div class="frase-dia">
+                    <p>Desde aquí, los detalles comenzaron a tener otro significado.</p>
+                </div>
+
+                <div class="imagen-dia">
+                    <img src="./img/Dia4.jpg" alt="Día 4">
+                </div>
+
+                <div class="resumen-dia">
+                    <p>Ese día comenzó una parte muy bonita de esta historia. Empecé a preparar detalles para ti y a
+                        buscar pequeñas maneras de demostrarte cuánto te valoro.</p>
+
+                    <p>También nos encontramos y compartimos tiempo juntos. Fuimos a buscar ropa y estuvimos viendo
+                        cosas, caminando y disfrutando de ese momento sin necesidad de hacer algo extraordinario.</p>
+
+                    <p>Me gusta recordar este día porque siento que fue cuando los pequeños regalos comenzaron a
+                        convertirse en una forma de guardar nuestros momentos.</p>
+
+                    <p>Cada detalle que preparaba tenía detrás tiempo, imaginación y muchas ganas de hacerte sonreír.
+                    </p>
+                </div>
+
+                <div class="mensaje-dia">
+                    <p>Desde ese día, cada detalle empezó a llevar un poquito de mi cariño hacia ti. ♡</p>
+                </div>
+            </div>
+
+
+            <!-- ==================== DÍA 5 ==================== -->
+            <div class="contenido-dia" id="dia-5">
+                <h2>Día 5 — Un pedacito de nosotros</h2>
+
+                <div class="frase-dia">
+                    <p>Los detalles más pequeños pueden guardar sentimientos enormes.</p>
+                </div>
+
+                <div class="imagen-dia">
+                    <img src="./img/Dia5.jpg" alt="Día 5">
+                </div>
+
+                <div class="resumen-dia">
+                    <p>Ese día quise hacer algo especial para ti. Te dibujé en un papelito y detrás escribí una carta,
+                        porque quería dejarte algo hecho por mí y que pudieras guardar como recuerdo.</p>
+
+                    <p>Después fuimos a la feria y compartimos otro de esos momentos que parecen normales mientras
+                        ocurren, pero que después se vuelven recuerdos muy bonitos.</p>
+
+                    <p>Ese mismo día también nació algo muy especial entre nosotros. Tú hiciste una pequeña bolsita para
+                        nuestra “farmacia” y yo puse las medicinas. Terminamos creando algo que para mí representaba una
+                        idea muy bonita: poder cuidarnos mutuamente.</p>
+
+                    <p>Me encantó que algo tan sencillo pudiera convertirse en algo tan nuestro. No era solamente una
+                        bolsita con cosas dentro. Era un pequeño símbolo de cariño y de querer estar pendientes el uno
+                        del otro.</p>
+                </div>
+
+                <div class="mensaje-dia">
+                    <p>Me encanta que hasta las cosas más sencillas puedan convertirse en recuerdos que siento tan
+                        nuestros. ♡</p>
+                </div>
+            </div>
+
+
+            <!-- ==================== DÍA 6 ==================== -->
+            <div class="contenido-dia" id="dia-6">
+                <h2>Día 6 — Un lugar para nuestros recuerdos</h2>
+
+                <div class="frase-dia">
+                    <p>Algunos recuerdos merecen tener un lugar propio.</p>
+                </div>
+
+                <div class="imagen-dia">
+                    <img src="./img/Dia6.jpg" alt="Día 6">
+                </div>
+
+                <div class="resumen-dia">
+                    <p>Ese día quise hacer algo diferente. Creé una página especialmente para ti, pensada para que
+                        pudieras interactuar con ella y encontrar pequeños detalles preparados con cariño.</p>
+
+                    <p>La idea era que cada parte pudiera guardar algo especial y que poco a poco se fuera convirtiendo
+                        en un espacio lleno de recuerdos.</p>
+
+                    <p>Me gustó poder crear algo desde cero pensando en ti, imaginando qué podrías encontrar, qué podría
+                        hacerte sonreír y cómo podía convertir una simple página en algo mucho más personal.</p>
+
+                    <p>Desde ese momento empezó a crecer todavía más la idea de guardar nuestros días de una manera
+                        diferente.</p>
+                </div>
+
+                <div class="mensaje-dia">
+                    <p>Hice ese pequeño mundo pensando en ti, porque algunos recuerdos merecen quedarse para siempre. ♡
+                    </p>
+                </div>
+            </div>
+
+
+            <!-- ==================== DÍA 7 ==================== -->
+            <div class="contenido-dia" id="dia-7">
+                <h2>Día 7 — Un día para sonreír</h2>
+
+                <div class="frase-dia">
+                    <p>Verte feliz también se convirtió en algo especial para mí.</p>
+                </div>
+
+                <div class="imagen-dia">
+                    <img src="imagenes/dia7.jpg" alt="Día 7">
+                </div>
+
+                <div class="resumen-dia">
+                    <p>Ese día me contaste que habías tenido un momento complicado con tu mejor amigo y que justamente
+                        era su cumpleaños.</p>
+
+                    <p>Lo bonito fue saber que pudieron reconciliarse y que pudiste recuperar la tranquilidad con
+                        alguien importante para ti.</p>
+
+                    <p>Me gustó poder conocer también esa parte de tu vida, porque cuando alguien te importa, también
+                        importa aquello que hace que esa persona esté feliz y tranquila.</p>
+
+                    <p>Me quedo con la alegría de saber que ese día terminó de una manera bonita para ti y que pudiste
+                        recuperar una amistad que significa mucho.</p>
+                </div>
+
+                <div class="mensaje-dia">
+                    <p>Me alegra verte feliz y tranquila, porque tu felicidad también es un motivo para sonreír. ♡</p>
+                </div>
+            </div>
+
+
+            <!-- ==================== DÍA 8 ==================== -->
+            <div class="contenido-dia" id="dia-8">
+                <h2>Día 8 — Un día para guardar</h2>
+
+                <div class="frase-dia">
+                    <p>Hay días que parecen largos porque están llenos de recuerdos.</p>
+                </div>
+
+                <div class="imagen-dia">
+                    <img src="./img/IMG-20260912-WA0034.jpg" alt="Día 8">
+                </div>
+
+                <div class="resumen-dia">
+                    <p>Ese día fui a estar contigo y pudimos compartir un buen rato juntos. Entre conversaciones y
+                        momentos sencillos, el día fue avanzando hasta que también tuvimos que ingeniarnos para
+                        continuar con nuestros planes.</p>
+
+                    <p>Después te acompañé hasta tus clases en la universidad y compartimos otro momento bonito en el
+                        camino.</p>
+
+                    <p>Me regalaste una manzana y recuerdo ese detalle con mucho cariño. Puede parecer algo pequeño,
+                        pero cuando viene de ti hasta algo tan sencillo puede convertirse en un recuerdo especial.</p>
+
+                    <p>Ese día también te entregué el libro que había creado para ti. Me gustaba la idea de que pudieras
+                        tener algo hecho especialmente para ti, con páginas que pudieras volver a mirar cuando
+                        quisieras.</p>
+
+                    <p>Antes de terminar el día también dejamos preparadas algunas cosas para el día siguiente, pensando
+                        en tomar tecito y hacer salchipapas juntos.</p>
+                </div>
+
+                <div class="mensaje-dia">
+                    <p>Gracias por convertir un día cualquiera en otro recuerdo que quiero guardar contigo. ♡</p>
+                </div>
+            </div>
+
+
+            <!-- ==================== DÍA 9 ==================== -->
+            <div class="contenido-dia" id="dia-9">
+                <h2>Día 9 — Un día lleno de momentos</h2>
+
+                <div class="frase-dia">
+                    <p>Un día, muchos recuerdos y una historia que sigue creciendo.</p>
+                </div>
+
+                <div class="imagen-dia">
+                    <img src="./img/Dia9.jpg" alt="Día 9">
+                </div>
+
+                <div class="resumen-dia">
+                    <p>Ese día fuimos a la casa de Viacha y compartimos nuestro tecito mientras preparábamos las cosas
+                        para comer. También vimos Ratatouille y disfrutamos de ese momento juntos.</p>
+
+                    <p>Mientras cocinábamos, cada uno estaba haciendo su parte. Incluso salí a comprar sal mientras tú
+                        continuabas preparando las cosas. Son momentos muy sencillos, pero justamente esos son los que
+                        más me gusta recordar.</p>
+
+                    <p>También hicimos nuestro juego de cartas. Ese momento fue importante para mí porque me animé a
+                        expresar algo que llevaba dentro y recibí una respuesta que no esperaba. Aun así, me quedo con
+                        el valor de haber sido sincero y con todo lo que aprendí de ese momento.</p>
+
+                    <p>Más tarde me pediste ayuda porque necesitabas algo con urgencia para poder grabar. Fui a
+                        llevártelo porque quería ayudarte y estar presente cuando lo necesitabas.</p>
+
+                    <p>Y al final del día todavía tuvimos nuestro cafecito con pan de limón. También estuviste con tu
+                        nuevo piercing de corazón en la nariz, otro pequeño detalle que hizo que ese día tuviera todavía
+                        más recuerdos.</p>
+                </div>
+
+                <div class="mensaje-dia">
+                    <p>Ese día aprendí que querer también significa seguir cuidando, aprendiendo y estando presente. ♡
+                    </p>
+                </div>
+            </div>
+
+
+            <!-- ==================== DÍA 10 ==================== -->
+            <div class="contenido-dia" id="dia-10">
+                <h2>Día 10 — Un detalle desde lejos</h2>
+
+                <div class="frase-dia">
+                    <p>A veces el cariño encuentra la manera de llegar.</p>
+                </div>
+
+                <div class="imagen-dia">
+                    <img src="./img/Dia10.jpg" alt="Día 10">
+                </div>
+
+                <div class="resumen-dia">
+                    <p>Ese día no pudimos encontrarnos, pero eso no hizo que dejara de pensar en ti. Preparé una flor
+                        hecha con un bolígrafo, porque quería regalarte algo que hubiera hecho con mis propias manos.
+                    </p>
+
+                    <p>También te escribí varios mensajes bonitos. Quería recordarte lo mucho que te quiero y hacerte
+                        saber que, aunque a veces el día no permita vernos, el cariño sigue estando ahí.</p>
+
+                    <p>Fue un día en el que también quise expresar lo que sentía y cuidar la forma en la que te hacía
+                        llegar mis palabras.</p>
+
+                    <p>Porque no siempre hace falta estar frente a frente para hacerle saber a alguien que ocupa un
+                        lugar importante en tu corazón.</p>
+                </div>
+
+                <div class="mensaje-dia">
+                    <p>Aunque ese día no pudimos vernos, quería que sintieras mi cariño cerquita de ti. ♡</p>
+                </div>
+            </div>
+
+
+            <!-- ==================== DÍA 11 ==================== -->
+            <div class="contenido-dia" id="dia-11">
+                <h2>Día 11 — Un detalle para recordar</h2>
+
+                <div class="frase-dia">
+                    <p>Hay regalos que guardan mucho más que un simple detalle.</p>
+                </div>
+
+                <div class="imagen-dia">
+                    <img src="./img/Dia11.jpg" alt="Día 11">
+                </div>
+
+                <div class="resumen-dia">
+                    <p>Ese día finalmente pudimos encontrarnos y pude entregarte algunos de los detalles que había
+                        preparado para ti.</p>
+
+                    <p>Entre ellos estaba el collar de las fresitas, ese que tiene una parte para cada uno y que juntos
+                        forman un corazón. También te entregué la flor hecha con bolígrafo, otro detalle que preparé
+                        pensando en ti.</p>
+
+                    <p>Después fuimos juntos hasta el teleférico morado. Compartimos ese camino, ese momento y
+                        finalmente un abrazo que hizo que todo se sintiera todavía más bonito.</p>
+
+                    <p>También compartimos nuestro primer panetón del año. Puede parecer una cosa pequeña, pero me gusta
+                        pensar que fue uno de esos primeros recuerdos que vamos construyendo juntos.</p>
+                </div>
+
+                <div class="mensaje-dia">
+                    <p>Ese abrazo, ese collar y ese primer panetón quedaron guardados como otro pedacito bonito de
+                        nosotros. ♡</p>
+                </div>
+            </div>
+
+
+            <!-- ==================== DÍA 12 ==================== -->
+            <div class="contenido-dia" id="dia-12">
+                <h2>Día 12 — Todo lo que quería regalarte</h2>
+
+                <div class="frase-dia">
+                    <p>Quería que este día estuviera lleno de pequeñas razones para sonreír.</p>
+                </div>
+
+                <div class="imagen-dia">
+                    <img src="./img/Dia12.jpg" alt="Día 12">
+                </div>
+
+                <div class="resumen-dia">
+                    <p>Ese día preparé varios detalles para ti. Hice una estrella, preparé un ramo de flores y también
+                        hice tulipanes con mis propias manos.</p>
+
+                    <p>Te llevé todos esos detalles porque quería que recibieras algo que tuviera tiempo, esfuerzo y
+                        cariño detrás. No quería que fuera simplemente un regalo, sino una colección de pequeños
+                        recuerdos que pudieras conservar.</p>
+
+                    <p>También preparé una carta y varios papelitos con palabras para ti. Cada uno tenía la intención de
+                        hacerte sentir especial y recordarte todo el cariño que te tengo.</p>
+
+                    <p>Fui hasta cerca de tu casa para poder entregártelo personalmente. Saber que finalmente podía
+                        darte todo lo que había preparado hizo que todo el esfuerzo valiera la pena.</p>
+
+                    <p>Y uno de los momentos que más voy a recordar es cuando vi cuánto significaron para ti las flores
+                        y los tulipanes. Ese momento hizo que todos los detalles tuvieran todavía más sentido.</p>
+                </div>
+
+                <div class="mensaje-dia">
+                    <p>Todo lo que hice ese día llevaba la misma intención: regalarte un poquito de felicidad. ♡</p>
+                </div>
+            </div>
+
+
+            <!-- ==================== DÍA 13 ==================== -->
+            <div class="contenido-dia" id="dia-13">
+                <h2>Día 13 — Otro recuerdo contigo</h2>
+
+                <div class="frase-dia">
+                    <p>Y así llegamos a otro día que quiero guardar.</p>
+                </div>
+
+                <div class="imagen-dia">
+                    <img src="imagenes/dia13.jpg" alt="Día 13">
+                </div>
+
+                <div class="resumen-dia">
+                    <p>Hoy volvimos a encontrarnos y quise llevarte un pequeño detalle: un chupete acompañado de una
+                        rosa.</p>
+
+                    <p>Después compartimos otro momento juntos y tomamos un batido mientras hablábamos y disfrutábamos
+                        de estar ahí. También estuvimos viendo vestidos y compartiendo ese tipo de momentos sencillos
+                        que terminan haciendo especial un día.</p>
+
+                    <p>No necesitábamos hacer algo enorme para que el día tuviera valor. Simplemente poder encontrarnos,
+                        compartir algo rico, mirar cosas juntos y después despedirnos ya fue suficiente para sumar otro
+                        recuerdo bonito a este calendario.</p>
+
+                    <p>Y ahora que llegamos al día 13, miro todo lo que se ha ido guardando aquí y me doy cuenta de que
+                        cada día tiene algo diferente. Una conversación, un regalo, un paseo, una comida, una sonrisa,
+                        una despedida o simplemente un momento juntos.</p>
+
+                    <p>Y todavía quedan muchos espacios por llenar.</p>
+                </div>
+
+                <div class="mensaje-dia">
+                    <p>Gracias por cada recuerdo hasta hoy. Me encanta seguir escribiendo esta historia, un día a la
+                        vez. ♡</p>
+                </div>
+            </div>
+
+            <!-- DÍA 14 -->
+            <div class="contenido-dia" id="dia-14">
+                <h2>Día 14</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia14.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 15 -->
+            <div class="contenido-dia" id="dia-15">
+                <h2>Día 15</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia15.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 16 -->
+            <div class="contenido-dia" id="dia-16">
+                <h2>Día 16</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia16.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 17 -->
+            <div class="contenido-dia" id="dia-17">
+                <h2>Día 17</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia17.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 18 -->
+            <div class="contenido-dia" id="dia-18">
+                <h2>Día 18</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia18.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 19 -->
+            <div class="contenido-dia" id="dia-19">
+                <h2>Día 19</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia19.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 20 -->
+            <div class="contenido-dia" id="dia-20">
+                <h2>Día 20</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia20.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 21 -->
+            <div class="contenido-dia" id="dia-21">
+                <h2>Día 21</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia21.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 22 -->
+            <div class="contenido-dia" id="dia-22">
+                <h2>Día 22</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia22.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 23 -->
+            <div class="contenido-dia" id="dia-23">
+                <h2>Día 23</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia23.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 24 -->
+            <div class="contenido-dia" id="dia-24">
+                <h2>Día 24</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia24.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 25 -->
+            <div class="contenido-dia" id="dia-25">
+                <h2>Día 25</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia25.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 26 -->
+            <div class="contenido-dia" id="dia-26">
+                <h2>Día 26</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia26.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 27 -->
+            <div class="contenido-dia" id="dia-27">
+                <h2>Día 27</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia27.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 28 -->
+            <div class="contenido-dia" id="dia-28">
+                <h2>Día 28</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia28.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 29 -->
+            <div class="contenido-dia" id="dia-29">
+                <h2>Día 29</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia29.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <!-- DÍA 30 -->
+            <div class="contenido-dia" id="dia-30">
+                <h2>Día 30</h2>
+                <div class="frase-dia">
+                    <p>Una frase para este día.</p>
+                </div>
+                <div class="imagen-dia"><img src="imagenes/dia30.jpg" alt=""></div>
+                <div class="resumen-dia">
+                    <p>Escribe aquí el resumen del día.</p>
+                </div>
+                <div class="mensaje-dia">
+                    <p>Escribe aquí tu mensaje especial.</p>
+                </div>
+            </div>
+
+            <button class="volver-calendario">← Volver al calendario</button>
+        </section>
+
+
+        <section class="final visible" id="final">
+            <h2>Una última página para guardar</h2>
+            <p>Mi cielito hermoso todavía quedan muchos recuerdos por escribir</p>
+            <p>Puedes volver aquí cuando quieras y seguire llenando este mes</p>
+            <p>Gracias por darle un significado tan bonito a estos días</p>
+        </section>
+    </main>
+
+    <script>
+        const calendario = document.getElementById("calendario");
+        const introduccion = document.getElementById("introduccion");
+        const final = document.getElementById("final");
+        const vistaDia = document.getElementById("vista-dia");
+        const mensajeBloqueado = document.getElementById("mensaje-bloqueado");
+        const botonesDia = document.querySelectorAll(".dia");
+        const botonesVolver = document.querySelectorAll(".volver-calendario");
+
+        const año = Number(calendario.dataset.year);
+        const mes = Number(calendario.dataset.month);
+
+        function fechaSinHora(fecha) {
+            return new Date(
+                fecha.getFullYear(),
+                fecha.getMonth(),
+                fecha.getDate()
+            );
+        }
+
+        const hoy = fechaSinHora(new Date());
+
+        botonesDia.forEach(boton => {
+            const numeroDia = Number(boton.dataset.dia);
+            const fechaDia = fechaSinHora(new Date(año, mes, numeroDia));
+
+            if (fechaDia < hoy) {
+                boton.classList.add("pasado");
+            } else if (fechaDia > hoy) {
+                boton.classList.add("futuro");
+            } else {
+                boton.classList.add("actual");
+            }
+
+            boton.addEventListener("click", () => {
+                if (fechaDia > hoy) {
+                    mostrarBloqueado();
+                } else {
+                    mostrarDia(numeroDia);
+                }
+            });
+        });
+
+        function ocultarInicio() {
+            calendario.classList.add("oculto");
+            introduccion.classList.add("oculto");
+            final.classList.remove("visible");
+        }
+
+        function mostrarDia(numeroDia) {
+            ocultarInicio();
+            mensajeBloqueado.classList.remove("activo");
+            vistaDia.classList.add("activo");
+
+            document.querySelectorAll(".contenido-dia").forEach(contenido => {
+                contenido.classList.remove("activo");
+            });
+
+            const contenidoSeleccionado = document.getElementById(`dia-${numeroDia}`);
+
+            if (contenidoSeleccionado) {
+                contenidoSeleccionado.classList.add("activo");
+            }
+
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function mostrarBloqueado() {
+            ocultarInicio();
+            vistaDia.classList.remove("activo");
+            mensajeBloqueado.classList.add("activo");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function volverAlCalendario() {
+            vistaDia.classList.remove("activo");
+            mensajeBloqueado.classList.remove("activo");
+            calendario.classList.remove("oculto");
+            introduccion.classList.remove("oculto");
+            final.classList.add("visible");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        botonesVolver.forEach(boton => {
+            boton.addEventListener("click", volverAlCalendario);
+        });
+    </script>
+</body>
+
+</html>
